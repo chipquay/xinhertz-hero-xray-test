@@ -7,28 +7,26 @@
 <meta name="description" content="Test playground: SOP-16 viewed flat — slide across the package to reveal 'Xinhertz — NXP Distributor' printed on the mold. MLCC cursor.">
 <style>
   :root{
-    --bg:#070b14; --ink:#e8eef7; --dim:#9aa7bd;
-    --xray:#7fd4ff; --gold:#ffd27f;
+    --bg:#ffffff; --bg2:#f3f7ff; --text:#12233f; --muted:#5b7194; --line:#d9e5fa;
+    --blue:#0b5ed7; --blue-dark:#0849a8; --gold:#ffd27f;
   }
   *{ margin:0; padding:0; box-sizing:border-box; }
   html,body{ height:100%; }
   body{
-    background:
-      radial-gradient(1100px 600px at 78% 30%, rgba(64,120,220,.14), transparent 60%),
-      radial-gradient(800px 500px at 12% 85%, rgba(127,212,255,.06), transparent 60%),
-      var(--bg);
-    color:var(--ink);
+    background:linear-gradient(180deg,#f3f7ff 0%,#ffffff 100%);
+    background-attachment:fixed;
+    color:var(--text);
     font-family:"Inter","Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;
     overflow-x:hidden;
   }
-  /* ---- MLCC capacitor cursor (3/4 angle), site-wide (demo) ---- */
-  body, body *{ cursor:url('assets/mlcc-cursor.png') 10 50, auto !important; }
+  /* ---- MLCC capacitor cursor (user's real photo), site-wide (demo) ---- */
+  body, body *{ cursor:url('assets/mlcc-cursor.png') 8 52, auto !important; }
 
   .grid-bg{
     position:fixed; inset:0; pointer-events:none; opacity:.5;
     background-image:
-      linear-gradient(rgba(127,212,255,.045) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(127,212,255,.045) 1px, transparent 1px);
+      linear-gradient(rgba(11,94,215,.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(11,94,215,.055) 1px, transparent 1px);
     background-size:44px 44px;
     -webkit-mask-image:radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 75%);
     mask-image:radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 75%);
@@ -36,8 +34,8 @@
 
   .badge{
     position:fixed; top:18px; right:20px; z-index:20;
-    font-size:11px; letter-spacing:.22em; color:#0a0f1a;
-    background:linear-gradient(135deg,var(--gold),#ffb35c);
+    font-size:11px; letter-spacing:.22em; color:#fff;
+    background:var(--blue);
     padding:7px 14px; border-radius:999px; font-weight:700;
   }
 
@@ -47,27 +45,27 @@
     align-items:center; padding:72px 40px 40px; position:relative; z-index:2;
   }
   .eyebrow{
-    font-size:12px; letter-spacing:.34em; color:var(--xray);
+    font-size:12px; letter-spacing:.34em; color:var(--blue);
     margin-bottom:22px; font-weight:600;
   }
   h1{
     font-size:clamp(40px,5.2vw,72px); line-height:1.04; font-weight:800;
     letter-spacing:-0.01em; margin-bottom:20px;
   }
-  h1 .x{ color:var(--xray); }
-  .sub{ font-size:16.5px; line-height:1.75; color:var(--dim); max-width:46ch; margin-bottom:30px; }
-  .sub b{ color:var(--ink); font-weight:600; }
+  h1 .x{ color:var(--blue); }
+  .sub{ font-size:16.5px; line-height:1.75; color:var(--muted); max-width:46ch; margin-bottom:30px; }
+  .sub b{ color:var(--text); font-weight:600; }
   .hint{
     display:inline-flex; align-items:center; gap:10px;
-    border:1px solid rgba(127,212,255,.35); border-radius:999px;
-    padding:10px 18px; font-size:13.5px; color:#cfe9ff;
-    background:rgba(20,40,70,.35);
+    border:1px solid var(--line); border-radius:999px;
+    padding:10px 18px; font-size:13.5px; color:var(--text);
+    background:#fff; box-shadow:0 6px 20px rgba(11,94,215,.08);
   }
-  .hint .dot{ width:9px; height:9px; border-radius:50%; background:var(--xray);
-    box-shadow:0 0 12px var(--xray); animation:pulse 1.8s infinite; }
+  .hint .dot{ width:9px; height:9px; border-radius:50%; background:var(--blue);
+    box-shadow:0 0 12px rgba(11,94,215,.6); animation:pulse 1.8s infinite; }
   @keyframes pulse{ 0%,100%{opacity:1; transform:scale(1);} 50%{opacity:.45; transform:scale(.8);} }
-  .meta{ margin-top:34px; font-size:12px; color:#5c6a84; letter-spacing:.06em; line-height:2; }
-  .meta code{ color:#8fa0bb; background:rgba(255,255,255,.05); padding:2px 8px; border-radius:6px; }
+  .meta{ margin-top:34px; font-size:12px; color:#9aa3b2; letter-spacing:.06em; line-height:2; }
+  .meta code{ color:var(--muted); background:#eef4ff; padding:2px 8px; border-radius:6px; }
 
   #stage{ position:relative; height:min(78vh,640px); min-height:420px; }
   #stage canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; }
@@ -78,7 +76,7 @@
   #fallback img{ max-width:70%; border-radius:12px; }
 
   .foot{ position:relative; z-index:2; text-align:center; padding:0 20px 26px;
-    font-size:11.5px; color:#4c5a74; letter-spacing:.12em; }
+    font-size:11.5px; color:#9aa3b2; letter-spacing:.12em; }
 
   @media (max-width:900px){
     .hero{ grid-template-columns:1fr; padding:84px 22px 20px; }
@@ -107,7 +105,7 @@
     <div class="meta">
       TEST PLAYGROUND — not the live site.<br>
       Repo: <code>chipquay/xinhertz-hero-xray-test</code><br>
-      Cursor: MLCC capacitor icon at 3/4 angle (AI-generated), applied site-wide.
+      Cursor: MLCC capacitor icon (from your photo), applied site-wide.
     </div>
   </section>
 
@@ -242,6 +240,24 @@ for (const s of [-1, 1]){
     chip.add(pin);
   }
 }
+
+// soft contact shadow (grounds the chip on the light background)
+function shadowTexture(){
+  const c = document.createElement('canvas'); c.width = 256; c.height = 256;
+  const g = c.getContext('2d');
+  const grad = g.createRadialGradient(128,128,10,128,128,126);
+  grad.addColorStop(0,'rgba(18,35,63,0.34)');
+  grad.addColorStop(0.6,'rgba(18,35,63,0.12)');
+  grad.addColorStop(1,'rgba(18,35,63,0)');
+  g.fillStyle = grad; g.fillRect(0,0,256,256);
+  return new THREE.CanvasTexture(c);
+}
+const shadow = new THREE.Mesh(
+  new THREE.PlaneGeometry(13.5, 8.5),
+  new THREE.MeshBasicMaterial({ map:shadowTexture(), transparent:true, depthWrite:false, opacity:0.85 })
+);
+shadow.rotation.x = -Math.PI/2; shadow.position.y = 0.015;
+chip.add(shadow);
 
 // invisible hover volume (stable raycast target)
 const hoverBox = new THREE.Mesh(
