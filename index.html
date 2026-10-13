@@ -186,25 +186,25 @@ const dot = new THREE.Mesh(
   new THREE.CircleGeometry(0.26, 24),
   new THREE.MeshBasicMaterial({ color:0x9aa0aa })
 );
-dot.rotation.x = -Math.PI/2; dot.position.set(-4.0, 0.878, -1.15);
+dot.rotation.x = -Math.PI/2; dot.position.set(-4.0, 1.752, -1.15);
 chip.add(dot);
 
 // laser marking (fades out on reveal)
 function markingTexture(){
-  const c = document.createElement('canvas'); c.width = 768; c.height = 288;
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 384;
   const g = c.getContext('2d');
-  g.clearRect(0,0,768,288);
+  g.clearRect(0,0,1024,384);
   g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.fillStyle = 'rgba(200,205,214,0.92)';
-  g.font = '700 118px Arial'; g.fillText('74HC595D', 384, 105);
-  g.fillStyle = 'rgba(200,205,214,0.72)';
-  g.font = '500 58px Arial'; g.fillText('XINHERTZ · 2631', 384, 210);
+  g.fillStyle = 'rgba(205,210,220,0.95)';
+  g.font = '700 150px Arial'; g.fillText('74HC595D', 512, 138);
+  g.fillStyle = 'rgba(205,210,220,0.78)';
+  g.font = '500 76px Arial'; g.fillText('XINHERTZ · 2631', 512, 278);
   const t = new THREE.CanvasTexture(c); t.anisotropy = 4;
   return t;
 }
 const markMat = new THREE.MeshBasicMaterial({ map:markingTexture(), transparent:true, opacity:1 });
 const mark = new THREE.Mesh(new THREE.PlaneGeometry(6.4, 2.4), markMat);
-mark.rotation.x = -Math.PI/2; mark.position.set(0, 0.879, 0);
+mark.rotation.x = -Math.PI/2; mark.position.set(0, 1.753, 0);
 mark.renderOrder = 1;
 chip.add(mark);
 
@@ -223,7 +223,7 @@ function revealTexture(){
 }
 const revealMat = new THREE.MeshBasicMaterial({ map:revealTexture(), transparent:true, opacity:0 });
 const reveal = new THREE.Mesh(new THREE.PlaneGeometry(8.2, 1.2), revealMat);
-reveal.rotation.x = -Math.PI/2; reveal.position.set(0, 0.8805, 0);
+reveal.rotation.x = -Math.PI/2; reveal.position.set(0, 1.7545, 0);
 reveal.renderOrder = 2;
 chip.add(reveal);
 
