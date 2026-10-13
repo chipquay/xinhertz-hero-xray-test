@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Xinhertz · 3D SOP-16 Reveal — Hero Concept Test</title>
-<meta name="description" content="Test playground: 3D SOP-16 chip hero — slide across the package to reveal 'Xinhertz — NXP Distributor'. MLCC cursor.">
+<title>Xinhertz · Flat SOP-16 Reveal — Hero Concept Test</title>
+<meta name="description" content="Test playground: SOP-16 viewed flat — slide across the package to reveal 'Xinhertz — NXP Distributor' printed on the mold. MLCC cursor.">
 <style>
   :root{
     --bg:#070b14; --ink:#e8eef7; --dim:#9aa7bd;
@@ -21,8 +21,8 @@
     font-family:"Inter","Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;
     overflow-x:hidden;
   }
-  /* ---- MLCC capacitor cursor, site-wide (demo) ---- */
-  body, body *{ cursor:url('assets/mlcc-cursor.png') 4 18, auto !important; }
+  /* ---- MLCC capacitor cursor (3/4 angle), site-wide (demo) ---- */
+  body, body *{ cursor:url('assets/mlcc-cursor.png') 10 50, auto !important; }
 
   .grid-bg{
     position:fixed; inset:0; pointer-events:none; opacity:.5;
@@ -96,21 +96,22 @@
     <div class="eyebrow">XINHERTZ &nbsp;·&nbsp; HOMEPAGE HERO CONCEPT</div>
     <h1>Slide across.<br><span class="x">See who we are.</span></h1>
     <p class="sub">
-      This 74HC595D (SOP-16) is rendered live in 3D and slowly rotates on its own.
-      <b>Slide your cursor across the package</b> and our identity shines through
-      from inside the chip — <b>Xinhertz, authorized NXP distributor</b>.
-      <b>Move away</b> and the package seals shut again.
+      This 74HC595D (SOP-16) lies flat, just like a product photo.
+      <b>Slide your cursor across the package</b> and the laser marking gives way
+      to our identity — <b>Xinhertz, authorized NXP distributor</b> — printed
+      right on the mold compound.
+      <b>Move away</b> and the original marking returns.
       Nothing else on the page moves.
     </p>
     <div class="hint"><span class="dot"></span>Slide across the chip to reveal &nbsp;·&nbsp; move away to restore</div>
     <div class="meta">
       TEST PLAYGROUND — not the live site.<br>
       Repo: <code>chipquay/xinhertz-hero-xray-test</code><br>
-      Cursor: MLCC capacitor icon (AI-generated), applied site-wide.
+      Cursor: MLCC capacitor icon at 3/4 angle (AI-generated), applied site-wide.
     </div>
   </section>
 
-  <section id="stage" aria-label="3D SOP-16 chip, slide across to reveal">
+  <section id="stage" aria-label="SOP-16 chip, flat view — slide across to reveal">
     <div id="fallback">
       <img src="assets/chip-photo.png" alt="74HC595D SOP-16 chip photo">
       <p>3D could not start here (WebGL or CDN blocked) — static photo fallback.</p>
@@ -118,7 +119,7 @@
   </section>
 </main>
 
-<div class="foot">XINHERTZ · 3D SOP-16 REVEAL — TEST BUILD</div>
+<div class="foot">XINHERTZ · FLAT SOP-16 REVEAL — TEST BUILD</div>
 
 <script type="importmap">
 { "imports": {
@@ -152,25 +153,26 @@ renderer.setClearColor(0x000000, 0);
 stage.prepend(renderer.domElement);
 
 const scene = new THREE.Scene();
+// near top-down: the chip lies flat like a product photo
 const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-camera.position.set(11.0, 6.8, 14.0);
-camera.lookAt(0, 0.7, 0);
+camera.position.set(0, 15, 2.2);
+camera.lookAt(0, 0.6, 0);
 
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
 scene.add(new THREE.HemisphereLight(0xbdd0ff, 0x1a1410, 0.55));
-const key = new THREE.DirectionalLight(0xffffff, 1.25); key.position.set(6, 10, 7); scene.add(key);
-const rim = new THREE.DirectionalLight(0x7fb4ff, 0.55); rim.position.set(-8, 4, -6); scene.add(rim);
+const key = new THREE.DirectionalLight(0xffffff, 1.25); key.position.set(2, 12, 3); scene.add(key);
+const rim = new THREE.DirectionalLight(0x7fb4ff, 0.45); rim.position.set(-8, 4, -6); scene.add(rim);
 
 /* ---------- materials ---------- */
 const bodyMat = new THREE.MeshPhysicalMaterial({
   color:0x161a22, roughness:0.42, metalness:0.15,
-  clearcoat:0.55, clearcoatRoughness:0.4, transparent:true, opacity:1
+  clearcoat:0.55, clearcoatRoughness:0.4
 });
 const metalMat = new THREE.MeshStandardMaterial({ color:0xd7dbe0, metalness:1.0, roughness:0.32 });
 
-/* ---------- chip group: SOP-16, real SOIC-16 proportions (units = mm) ---------- */
+/* ---------- chip: SOP-16, real SOIC-16 proportions, lying flat (units = mm) ---------- */
 const chip = new THREE.Group();
 scene.add(chip);
 
@@ -179,13 +181,15 @@ const body = new THREE.Mesh(new RoundedBoxGeometry(10.0, 1.75, 3.9, 4, 0.14), bo
 body.position.y = 0.875;
 chip.add(body);
 
-// pin-1 dot
-const dotMat = new THREE.MeshBasicMaterial({ color:0x9aa0aa, transparent:true, opacity:1 });
-const dot = new THREE.Mesh(new THREE.CircleGeometry(0.26, 24), dotMat);
+// pin-1 dot (always visible)
+const dot = new THREE.Mesh(
+  new THREE.CircleGeometry(0.26, 24),
+  new THREE.MeshBasicMaterial({ color:0x9aa0aa })
+);
 dot.rotation.x = -Math.PI/2; dot.position.set(-4.0, 0.878, -1.15);
 chip.add(dot);
 
-// laser marking
+// laser marking (fades out on reveal)
 function markingTexture(){
   const c = document.createElement('canvas'); c.width = 768; c.height = 288;
   const g = c.getContext('2d');
@@ -201,7 +205,27 @@ function markingTexture(){
 const markMat = new THREE.MeshBasicMaterial({ map:markingTexture(), transparent:true, opacity:1 });
 const mark = new THREE.Mesh(new THREE.PlaneGeometry(6.4, 2.4), markMat);
 mark.rotation.x = -Math.PI/2; mark.position.set(0, 0.879, 0);
+mark.renderOrder = 1;
 chip.add(mark);
+
+// identity text, printed flat on the mold (fades in on reveal)
+function revealTexture(){
+  const c = document.createElement('canvas'); c.width = 1500; c.height = 220;
+  const g = c.getContext('2d');
+  g.clearRect(0,0,1500,220);
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.shadowColor = 'rgba(240,102,92,0.55)'; g.shadowBlur = 14;
+  g.fillStyle = '#f0665c';
+  g.font = '700 96px Arial';
+  g.fillText('Xinhertz — NXP Distributor', 750, 112);
+  const t = new THREE.CanvasTexture(c); t.anisotropy = 8;
+  return t;
+}
+const revealMat = new THREE.MeshBasicMaterial({ map:revealTexture(), transparent:true, opacity:0 });
+const reveal = new THREE.Mesh(new THREE.PlaneGeometry(8.2, 1.2), revealMat);
+reveal.rotation.x = -Math.PI/2; reveal.position.set(0, 0.8805, 0);
+reveal.renderOrder = 2;
+chip.add(reveal);
 
 // gull-wing leads: 8 per side, 1.27 pitch
 const PIN_XS = [];
@@ -219,34 +243,6 @@ for (const s of [-1, 1]){
   }
 }
 
-/* ---------- reveal text: shines from inside the package on hover ---------- */
-function revealTexture(){
-  const c = document.createElement('canvas'); c.width = 1400; c.height = 520;
-  const g = c.getContext('2d');
-  g.clearRect(0,0,1400,520);
-  g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.shadowColor = 'rgba(127,212,255,0.95)'; g.shadowBlur = 42;
-  g.fillStyle = '#eaf6ff';
-  g.font = '800 168px Arial';
-  g.fillText('Xinhertz', 700, 175);
-  g.shadowBlur = 30;
-  g.fillStyle = '#cfe9ff';
-  g.font = '800 104px Arial';
-  g.fillText('NXP DISTRIBUTOR', 700, 375);
-  const t = new THREE.CanvasTexture(c); t.anisotropy = 4;
-  return t;
-}
-const revealMat = new THREE.MeshBasicMaterial({
-  map:revealTexture(), transparent:true, opacity:0, depthWrite:false
-});
-const reveal = new THREE.Mesh(new THREE.PlaneGeometry(7.6, 2.9), revealMat);
-reveal.position.set(0, 0.95, 0);
-chip.add(reveal);
-
-// soft inner light for the reveal moment
-const glow = new THREE.PointLight(0x77bbff, 0, 16);
-glow.position.set(0, 1.6, 0); chip.add(glow);
-
 // invisible hover volume (stable raycast target)
 const hoverBox = new THREE.Mesh(
   new THREE.BoxGeometry(12.0, 3.6, 7.6),
@@ -254,7 +250,7 @@ const hoverBox = new THREE.Mesh(
 );
 hoverBox.position.y = 0.9; chip.add(hoverBox);
 
-/* ---------- interaction: slide across -> reveal ---------- */
+/* ---------- interaction: slide across -> marking crossfades to identity ---------- */
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2(-2, -2);
 let revealTarget = 0, revealK = 0;
@@ -292,9 +288,7 @@ const clock = new THREE.Clock();
 function animate(){
   requestAnimationFrame(animate);
   const dt = Math.min(clock.getDelta(), 0.05);
-  const t = clock.elapsedTime;
 
-  // hover test
   if (pointerOnStage){
     raycaster.setFromCamera(pointer, camera);
     revealTarget = raycaster.intersectObject(hoverBox, false).length ? 1 : 0;
@@ -304,18 +298,9 @@ function animate(){
   revealK += (revealTarget - revealK) * Math.min(1, dt * 5);
   if (Math.abs(revealTarget - revealK) < 0.002) revealK = revealTarget;
 
-  // idle 3D motion (slows while revealing)
-  chip.rotation.y += dt * (0.38 - 0.26 * revealK);
-  chip.position.y = Math.sin(t * 1.15) * 0.16;
-
-  // package fades, identity shines through
-  bodyMat.opacity = 1 - 0.78 * revealK;
-  bodyMat.depthWrite = revealK < 0.5;
+  // flat crossfade: laser marking <-> identity text, package stays solid
   markMat.opacity = 1 - revealK;
-  dotMat.opacity = 1 - revealK;
   revealMat.opacity = revealK;
-  glow.intensity = 9 * revealK;
-  reveal.quaternion.copy(camera.quaternion);   // billboard: always face viewer
 
   renderer.render(scene, camera);
 }
