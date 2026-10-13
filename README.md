@@ -1,32 +1,34 @@
 # xinhertz-hero-xray-test
 
-**TEST ONLY playground** — 3D X-ray SOP-8 hero animation + diode cursor,
+**TEST ONLY playground** — 3D SOP-16 hero reveal + MLCC cursor,
 a concept for the xinhertz.top homepage hero.
 
 This repo is intentionally separate from the live site
 (`chipquay/chipquay.github.io`). Nothing here affects xinhertz.top.
 
-## What is being tested
+## What is being tested (v2, 2026-10-13)
 
-1. **3D SOP-8 chip** (Three.js, procedural model — real SOIC-8 proportions):
-   slow auto-rotation + gentle float.
-2. **X-ray on hover**: resting the cursor on the package fades the epoxy
-   mold compound and reveals the internals — silicon die, gold wire bonds,
-   copper leadframe — with part labels. Moving the cursor away restores the
-   package. Nothing else on the page moves.
-3. **Diode cursor**: the whole page uses a diode icon as the mouse cursor
-   (made from a real diode product photo).
-4. Mobile: tap the chip toggles X-ray. WebGL/CDN failure: static photo fallback.
+1. **3D SOP-16 chip** (Three.js, procedural model — real SOIC-16 proportions,
+   marked `74HC595D`): slow auto-rotation + gentle float.
+2. **Reveal on hover**: sliding the cursor across the package fades the epoxy
+   mold compound and the identity **"Xinhertz — NXP Distributor"** shines
+   through from inside the chip (glowing billboard text). Moving the cursor
+   away seals the package shut again. Nothing else on the page moves.
+   (v1 showed internal die/wire-bond structure — removed per user request.)
+3. **MLCC cursor**: the whole page uses an AI-generated MLCC chip-capacitor
+   icon as the mouse cursor (user's MLCC photo was reference only).
+4. Mobile: tap the chip toggles the reveal. WebGL/CDN failure: static photo fallback.
 
 ## View it
 
-https://chipquay.github.io/xinhertz-hero-xray-test/
+https://xinhertz.top/xinhertz-hero-xray-test/
 
 ## Files
 
 - `index.html` — everything (inline CSS + module JS, Three.js via CDN)
-- `assets/diode-cursor.png` / `assets/diode-cursor@2x.png` — cursor icons
-- `assets/chip-photo.png` — fallback photo
+- `assets/mlcc-cursor.png` — cursor icon (AI-generated)
+- `assets/media-generation-mlcc-raw-*.png` — cursor source render
+- `assets/chip-photo.png` — fallback photo (74HC595D)
 
 ## Next step (after user approval)
 

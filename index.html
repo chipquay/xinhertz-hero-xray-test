@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Xinhertz · 3D X-ray SOP-8 — Hero Concept Test</title>
-<meta name="description" content="Test playground: 3D X-ray SOP-8 hero animation with diode cursor for the xinhertz.top homepage.">
+<title>Xinhertz · 3D SOP-16 Reveal — Hero Concept Test</title>
+<meta name="description" content="Test playground: 3D SOP-16 chip hero — slide across the package to reveal 'Xinhertz — NXP Distributor'. MLCC cursor.">
 <style>
   :root{
     --bg:#070b14; --ink:#e8eef7; --dim:#9aa7bd;
@@ -21,8 +21,8 @@
     font-family:"Inter","Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;
     overflow-x:hidden;
   }
-  /* ---- diode cursor, site-wide (demo) ---- */
-  body, body *{ cursor:url('assets/diode-cursor.png') 3 16, auto !important; }
+  /* ---- MLCC capacitor cursor, site-wide (demo) ---- */
+  body, body *{ cursor:url('assets/mlcc-cursor.png') 4 18, auto !important; }
 
   .grid-bg{
     position:fixed; inset:0; pointer-events:none; opacity:.5;
@@ -71,16 +71,6 @@
 
   #stage{ position:relative; height:min(78vh,640px); min-height:420px; }
   #stage canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; }
-  #labels{ position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .35s ease; }
-  .tag{ position:absolute; left:0; top:0; display:flex; align-items:center; gap:9px;
-    transform:translate(-4px,-50%); will-change:left,top; }
-  .tag i{ width:8px; height:8px; border-radius:50%; background:var(--xray);
-    box-shadow:0 0 10px var(--xray); flex:none; font-style:normal; }
-  .tag span{ font-size:12px; letter-spacing:.1em; color:#d8ecff; white-space:nowrap;
-    background:rgba(8,18,36,.78); border:1px solid rgba(127,212,255,.4);
-    padding:5px 12px; border-radius:999px; }
-  .tag.gold i{ background:var(--gold); box-shadow:0 0 10px var(--gold); }
-  .tag.gold span{ border-color:rgba(255,210,127,.4); color:#ffe9c4; }
 
   #fallback{ display:none; position:absolute; inset:0; align-items:center; justify-content:center;
     flex-direction:column; gap:14px; text-align:center; color:var(--dim); font-size:14px; padding:20px; }
@@ -104,38 +94,31 @@
 <main class="hero">
   <section>
     <div class="eyebrow">XINHERTZ &nbsp;·&nbsp; HOMEPAGE HERO CONCEPT</div>
-    <h1>Inside<br>every <span class="x">chip.</span></h1>
+    <h1>Slide across.<br><span class="x">See who we are.</span></h1>
     <p class="sub">
-      This SOP-8 is rendered live in 3D and slowly rotates on its own.
-      <b>Rest your cursor on the package</b> and it turns to X-ray —
-      silicon die, gold wire bonds and copper leadframe revealed.
-      <b>Move away</b> and the mold compound seals shut again.
+      This 74HC595D (SOP-16) is rendered live in 3D and slowly rotates on its own.
+      <b>Slide your cursor across the package</b> and our identity shines through
+      from inside the chip — <b>Xinhertz, authorized NXP distributor</b>.
+      <b>Move away</b> and the package seals shut again.
       Nothing else on the page moves.
     </p>
-    <div class="hint"><span class="dot"></span>Hover the chip for X-ray &nbsp;·&nbsp; move away to restore</div>
+    <div class="hint"><span class="dot"></span>Slide across the chip to reveal &nbsp;·&nbsp; move away to restore</div>
     <div class="meta">
       TEST PLAYGROUND — not the live site.<br>
       Repo: <code>chipquay/xinhertz-hero-xray-test</code><br>
-      Cursor: diode icon, applied site-wide.
+      Cursor: MLCC capacitor icon (AI-generated), applied site-wide.
     </div>
   </section>
 
-  <section id="stage" aria-label="3D SOP-8 chip, hover for X-ray view">
-    <div id="labels">
-      <div class="tag" id="lb-die"><i></i><span>SILICON DIE</span></div>
-      <div class="tag gold" id="lb-wire"><i></i><span>GOLD WIRE BONDS</span></div>
-      <div class="tag gold" id="lb-frame"><i></i><span>COPPER LEADFRAME</span></div>
-      <div class="tag" id="lb-lead"><i></i><span>TIN-PLATED LEADS</span></div>
-      <div class="tag" id="lb-mold"><i></i><span>EPOXY MOLD COMPOUND</span></div>
-    </div>
+  <section id="stage" aria-label="3D SOP-16 chip, slide across to reveal">
     <div id="fallback">
-      <img src="assets/chip-photo.png" alt="SOP-8 chip photo">
+      <img src="assets/chip-photo.png" alt="74HC595D SOP-16 chip photo">
       <p>3D could not start here (WebGL or CDN blocked) — static photo fallback.</p>
     </div>
   </section>
 </main>
 
-<div class="foot">XINHERTZ · 3D X-RAY HERO — TEST BUILD</div>
+<div class="foot">XINHERTZ · 3D SOP-16 REVEAL — TEST BUILD</div>
 
 <script type="importmap">
 { "imports": {
@@ -151,7 +134,6 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 window.__xrayBooted = false;
 const stage = document.getElementById('stage');
-const labelsEl = document.getElementById('labels');
 
 function showFallback(){
   document.getElementById('fallback').classList.add('show');
@@ -171,7 +153,7 @@ stage.prepend(renderer.domElement);
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-camera.position.set(8.4, 5.6, 11.2);
+camera.position.set(11.0, 6.8, 14.0);
 camera.lookAt(0, 0.7, 0);
 
 const pmrem = new THREE.PMREMGenerator(renderer);
@@ -186,48 +168,44 @@ const bodyMat = new THREE.MeshPhysicalMaterial({
   color:0x161a22, roughness:0.42, metalness:0.15,
   clearcoat:0.55, clearcoatRoughness:0.4, transparent:true, opacity:1
 });
-const metalMat  = new THREE.MeshStandardMaterial({ color:0xd7dbe0, metalness:1.0, roughness:0.32 });
-const copperMat = new THREE.MeshStandardMaterial({ color:0xb87333, metalness:0.95, roughness:0.30 });
-const dieMat    = new THREE.MeshStandardMaterial({ color:0x33415e, metalness:0.85, roughness:0.28,
-                                                   emissive:0x2a6cff, emissiveIntensity:0 });
-const goldMat   = new THREE.MeshStandardMaterial({ color:0xd9a92e, metalness:1.0, roughness:0.25,
-                                                   emissive:0x664400, emissiveIntensity:0 });
+const metalMat = new THREE.MeshStandardMaterial({ color:0xd7dbe0, metalness:1.0, roughness:0.32 });
 
-/* ---------- chip group (units = mm, real SOIC-8 proportions) ---------- */
+/* ---------- chip group: SOP-16, real SOIC-16 proportions (units = mm) ---------- */
 const chip = new THREE.Group();
 scene.add(chip);
 
-// epoxy mold compound body: 4.9 x 1.75 x 3.9
-const body = new THREE.Mesh(new RoundedBoxGeometry(4.9, 1.75, 3.9, 4, 0.14), bodyMat);
+// epoxy body: 10.0 x 1.75 x 3.9
+const body = new THREE.Mesh(new RoundedBoxGeometry(10.0, 1.75, 3.9, 4, 0.14), bodyMat);
 body.position.y = 0.875;
 chip.add(body);
 
 // pin-1 dot
 const dotMat = new THREE.MeshBasicMaterial({ color:0x9aa0aa, transparent:true, opacity:1 });
 const dot = new THREE.Mesh(new THREE.CircleGeometry(0.26, 24), dotMat);
-dot.rotation.x = -Math.PI/2; dot.position.set(-1.55, 0.878, -1.15);
+dot.rotation.x = -Math.PI/2; dot.position.set(-4.0, 0.878, -1.15);
 chip.add(dot);
 
-// laser marking (canvas texture on top face)
+// laser marking
 function markingTexture(){
-  const c = document.createElement('canvas'); c.width = 512; c.height = 320;
+  const c = document.createElement('canvas'); c.width = 768; c.height = 288;
   const g = c.getContext('2d');
-  g.clearRect(0,0,512,320);
-  g.fillStyle = 'rgba(200,205,214,0.92)';
+  g.clearRect(0,0,768,288);
   g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.font = '700 92px Arial'; g.fillText('XH358A', 256, 118);
-  g.font = '500 54px Arial'; g.fillStyle = 'rgba(200,205,214,0.75)';
-  g.fillText('26  17K', 256, 218);
+  g.fillStyle = 'rgba(200,205,214,0.92)';
+  g.font = '700 118px Arial'; g.fillText('74HC595D', 384, 105);
+  g.fillStyle = 'rgba(200,205,214,0.72)';
+  g.font = '500 58px Arial'; g.fillText('XINHERTZ · 2631', 384, 210);
   const t = new THREE.CanvasTexture(c); t.anisotropy = 4;
   return t;
 }
 const markMat = new THREE.MeshBasicMaterial({ map:markingTexture(), transparent:true, opacity:1 });
-const mark = new THREE.Mesh(new THREE.PlaneGeometry(3.3, 2.06), markMat);
-mark.rotation.x = -Math.PI/2; mark.position.set(0.15, 0.879, 0);
+const mark = new THREE.Mesh(new THREE.PlaneGeometry(6.4, 2.4), markMat);
+mark.rotation.x = -Math.PI/2; mark.position.set(0, 0.879, 0);
 chip.add(mark);
 
-// gull-wing leads, 4 per side, 1.27 pitch
-const PIN_XS = [-1.905, -0.635, 0.635, 1.905];
+// gull-wing leads: 8 per side, 1.27 pitch
+const PIN_XS = [];
+for (let i = 0; i < 8; i++) PIN_XS.push(-4.445 + i * 1.27);
 for (const s of [-1, 1]){
   for (const x of PIN_XS){
     const pin = new THREE.Group();
@@ -241,56 +219,45 @@ for (const s of [-1, 1]){
   }
 }
 
-// copper leadframe: die paddle + fingers
-const paddle = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.12, 2.7), copperMat);
-paddle.position.y = 0.50; chip.add(paddle);
-for (const s of [-1, 1]){
-  for (const x of PIN_XS){
-    const finger = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.10, 1.05), copperMat);
-    finger.position.set(x, 0.50, s*1.85); chip.add(finger);
-  }
+/* ---------- reveal text: shines from inside the package on hover ---------- */
+function revealTexture(){
+  const c = document.createElement('canvas'); c.width = 1400; c.height = 520;
+  const g = c.getContext('2d');
+  g.clearRect(0,0,1400,520);
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.shadowColor = 'rgba(127,212,255,0.95)'; g.shadowBlur = 42;
+  g.fillStyle = '#eaf6ff';
+  g.font = '800 168px Arial';
+  g.fillText('Xinhertz', 700, 170);
+  g.shadowBlur = 26;
+  g.fillStyle = '#bfe3ff';
+  g.font = '600 84px Arial';
+  g.fillText('—  NXP Distributor  —', 700, 360);
+  const t = new THREE.CanvasTexture(c); t.anisotropy = 4;
+  return t;
 }
+const revealMat = new THREE.MeshBasicMaterial({
+  map:revealTexture(), transparent:true, opacity:0, depthWrite:false
+});
+const reveal = new THREE.Mesh(new THREE.PlaneGeometry(7.0, 2.6), revealMat);
+reveal.position.set(0, 0.95, 0);
+chip.add(reveal);
 
-// silicon die
-const die = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.30, 2.1), dieMat);
-die.position.y = 0.71; chip.add(die);
-
-// gold wire bonds: die edge -> lead finger
-for (const s of [-1, 1]){
-  for (const x of PIN_XS){
-    const curve = new THREE.QuadraticBezierCurve3(
-      new THREE.Vector3(x, 0.88, s*0.95),
-      new THREE.Vector3(x, 1.30, s*1.60),
-      new THREE.Vector3(x, 0.58, s*2.20)
-    );
-    chip.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 16, 0.035, 6), goldMat));
-  }
-}
-
-// inner X-ray glow
-const glow = new THREE.PointLight(0x77bbff, 0, 14);
-glow.position.set(0, 1.4, 0); chip.add(glow);
+// soft inner light for the reveal moment
+const glow = new THREE.PointLight(0x77bbff, 0, 16);
+glow.position.set(0, 1.6, 0); chip.add(glow);
 
 // invisible hover volume (stable raycast target)
 const hoverBox = new THREE.Mesh(
-  new THREE.BoxGeometry(7.4, 3.6, 7.4),
+  new THREE.BoxGeometry(12.0, 3.6, 7.6),
   new THREE.MeshBasicMaterial({ visible:false })
 );
 hoverBox.position.y = 0.9; chip.add(hoverBox);
 
-/* ---------- labels ---------- */
-const labels = [
-  { el:document.getElementById('lb-die'),   v:new THREE.Vector3(0, 0.95, 0) },
-  { el:document.getElementById('lb-wire'),  v:new THREE.Vector3(-0.635, 1.30, 1.60) },
-  { el:document.getElementById('lb-frame'), v:new THREE.Vector3(0.635, 0.55, -2.10) },
-  { el:document.getElementById('lb-lead'),  v:new THREE.Vector3(1.905, 0.28, 3.30) },
-  { el:document.getElementById('lb-mold'),  v:new THREE.Vector3(-2.45, 1.15, -1.00) },
-];
-
-/* ---------- interaction: hover -> X-ray ---------- */
+/* ---------- interaction: slide across -> reveal ---------- */
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2(-2, -2);
-let xrayTarget = 0, xray = 0;
+let revealTarget = 0, revealK = 0;
 let pointerOnStage = false;
 
 function setPointer(e){
@@ -303,10 +270,11 @@ renderer.domElement.addEventListener('pointermove', e=>{
 });
 renderer.domElement.addEventListener('pointerleave', ()=>{ pointerOnStage = false; });
 renderer.domElement.addEventListener('pointerdown', e=>{
-  if (e.pointerType === 'touch'){           // tap toggles X-ray on mobile
+  if (e.pointerType === 'touch'){           // tap toggles reveal on mobile
     setPointer(e);
     raycaster.setFromCamera(pointer, camera);
-    if (raycaster.intersectObject(hoverBox, false).length) xrayTarget = xrayTarget > 0.5 ? 0 : 1;
+    if (raycaster.intersectObject(hoverBox, false).length)
+      revealTarget = revealTarget > 0.5 ? 0 : 1;
   }
 });
 
@@ -320,7 +288,6 @@ window.addEventListener('resize', resize); resize();
 
 /* ---------- animate ---------- */
 const clock = new THREE.Clock();
-const tmpV = new THREE.Vector3();
 
 function animate(){
   requestAnimationFrame(animate);
@@ -330,36 +297,25 @@ function animate(){
   // hover test
   if (pointerOnStage){
     raycaster.setFromCamera(pointer, camera);
-    xrayTarget = raycaster.intersectObject(hoverBox, false).length ? 1 : 0;
+    revealTarget = raycaster.intersectObject(hoverBox, false).length ? 1 : 0;
   } else {
-    xrayTarget = 0;
+    revealTarget = 0;
   }
-  xray += (xrayTarget - xray) * Math.min(1, dt * 5);
-  if (Math.abs(xrayTarget - xray) < 0.002) xray = xrayTarget;
+  revealK += (revealTarget - revealK) * Math.min(1, dt * 5);
+  if (Math.abs(revealTarget - revealK) < 0.002) revealK = revealTarget;
 
-  // idle 3D motion (slows while inspecting)
-  chip.rotation.y += dt * (0.38 - 0.26 * xray);
+  // idle 3D motion (slows while revealing)
+  chip.rotation.y += dt * (0.38 - 0.26 * revealK);
   chip.position.y = Math.sin(t * 1.15) * 0.16;
 
-  // X-ray crossfade
-  bodyMat.opacity = 1 - 0.85 * xray;
-  bodyMat.depthWrite = xray < 0.5;
-  markMat.opacity = 1 - xray;
-  dotMat.opacity = 1 - xray;
-  dieMat.emissiveIntensity = 1.15 * xray;
-  goldMat.emissiveIntensity = 0.35 * xray;
-  glow.intensity = 7 * xray;
-
-  // labels
-  labelsEl.style.opacity = xray > 0.35 ? String((xray - 0.35) / 0.65) : '0';
-  const w = stage.clientWidth, h = stage.clientHeight;
-  for (const L of labels){
-    tmpV.copy(L.v).applyMatrix4(chip.matrixWorld).project(camera);
-    if (tmpV.z > 1 || xray < 0.35){ L.el.style.display = 'none'; continue; }
-    L.el.style.display = 'flex';
-    L.el.style.left = ((tmpV.x * 0.5 + 0.5) * w) + 'px';
-    L.el.style.top  = ((-tmpV.y * 0.5 + 0.5) * h) + 'px';
-  }
+  // package fades, identity shines through
+  bodyMat.opacity = 1 - 0.72 * revealK;
+  bodyMat.depthWrite = revealK < 0.5;
+  markMat.opacity = 1 - revealK;
+  dotMat.opacity = 1 - revealK;
+  revealMat.opacity = revealK;
+  glow.intensity = 9 * revealK;
+  reveal.quaternion.copy(camera.quaternion);   // billboard: always face viewer
 
   renderer.render(scene, camera);
 }
