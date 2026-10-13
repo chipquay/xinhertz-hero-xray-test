@@ -228,18 +228,18 @@ function revealTexture(){
   g.shadowColor = 'rgba(127,212,255,0.95)'; g.shadowBlur = 42;
   g.fillStyle = '#eaf6ff';
   g.font = '800 168px Arial';
-  g.fillText('Xinhertz', 700, 170);
-  g.shadowBlur = 26;
-  g.fillStyle = '#bfe3ff';
-  g.font = '600 84px Arial';
-  g.fillText('—  NXP Distributor  —', 700, 360);
+  g.fillText('Xinhertz', 700, 175);
+  g.shadowBlur = 30;
+  g.fillStyle = '#cfe9ff';
+  g.font = '800 104px Arial';
+  g.fillText('NXP DISTRIBUTOR', 700, 375);
   const t = new THREE.CanvasTexture(c); t.anisotropy = 4;
   return t;
 }
 const revealMat = new THREE.MeshBasicMaterial({
   map:revealTexture(), transparent:true, opacity:0, depthWrite:false
 });
-const reveal = new THREE.Mesh(new THREE.PlaneGeometry(7.0, 2.6), revealMat);
+const reveal = new THREE.Mesh(new THREE.PlaneGeometry(7.6, 2.9), revealMat);
 reveal.position.set(0, 0.95, 0);
 chip.add(reveal);
 
@@ -309,7 +309,7 @@ function animate(){
   chip.position.y = Math.sin(t * 1.15) * 0.16;
 
   // package fades, identity shines through
-  bodyMat.opacity = 1 - 0.72 * revealK;
+  bodyMat.opacity = 1 - 0.78 * revealK;
   bodyMat.depthWrite = revealK < 0.5;
   markMat.opacity = 1 - revealK;
   dotMat.opacity = 1 - revealK;
