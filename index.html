@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Xinhertz · Flat SOP-16 Reveal — Hero Concept Test</title>
-<meta name="description" content="Test playground: SOP-16 viewed flat — slide across the package to reveal 'Xinhertz — NXP Distributor' printed on the mold. MLCC cursor.">
+<title>Xinhertz · Electric SOP-16 — Hero Concept Test</title>
+<meta name="description" content="Test playground: SOP-16 viewed flat with electric arcs crawling its edges — slide across to charge them and reveal 'Xinhertz — NXP Distributor'. MLCC cursor.">
 <style>
   :root{
     --bg:#ffffff; --bg2:#f3f7ff; --text:#12233f; --muted:#5b7194; --line:#d9e5fa;
@@ -99,7 +99,8 @@
       to our identity — <b>Xinhertz, authorized NXP distributor</b> — printed
       right on the mold compound.
       <b>Move away</b> and the original marking returns.
-      Nothing else on the page moves.
+      Faint electric current crawls along the package edges at all times —
+      <b>hover to charge it up</b>. Nothing else on the page moves.
     </p>
     <div class="hint"><span class="dot"></span>Slide across the chip to reveal &nbsp;·&nbsp; move away to restore</div>
     <div class="meta">
@@ -117,7 +118,7 @@
   </section>
 </main>
 
-<div class="foot">XINHERTZ · FLAT SOP-16 REVEAL — TEST BUILD</div>
+<div class="foot">XINHERTZ · ELECTRIC SOP-16 — TEST BUILD</div>
 
 <script type="importmap">
 { "imports": {
@@ -266,6 +267,147 @@ const hoverBox = new THREE.Mesh(
 );
 hoverBox.position.y = 0.9; chip.add(hoverBox);
 
+/* ---------- electric arcs overlay (Canvas 2D, chip-blue) ---------- */
+const arcCanvas = document.createElement('canvas');
+arcCanvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;';
+stage.appendChild(arcCanvas);
+const actx = arcCanvas.getContext('2d');
+
+const ARC = { pts:[], cum:[], total:0, pinTips:[], strands:[], leaps:[], leapTimer:0 };
+
+function rebuildArcGeometry(){
+  const w = stage.clientWidth, h = stage.clientHeight;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  arcCanvas.width = w * dpr; arcCanvas.height = h * dpr;
+  actx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  // outline: 3D rect perimeter sampled at the body top face
+  const Y = 1.78, HX = 5.0, HZ = 1.95, N = 160;
+  const corners = [
+    new THREE.Vector3(-HX, Y, -HZ), new THREE.Vector3(HX, Y, -HZ),
+    new THREE.Vector3(HX, Y, HZ), new THREE.Vector3(-HX, Y, HZ),
+  ];
+  const raw = [];
+  for (let e = 0; e < 4; e++){
+    const a = corners[e], b = corners[(e+1) % 4];
+    for (let i = 0; i < N / 4; i++) raw.push(new THREE.Vector3().lerpVectors(a, b, i / (N / 4)));
+  }
+  ARC.pts = raw.map(p => {
+    const v = p.clone().project(camera);
+    return { x: (v.x * 0.5 + 0.5) * w, y: (-v.y * 0.5 + 0.5) * h };
+  });
+  ARC.cum = [0];
+  for (let i = 1; i <= ARC.pts.length; i++){
+    const a = ARC.pts[i-1], b = ARC.pts[i % ARC.pts.length];
+    ARC.cum.push(ARC.cum[i-1] + Math.hypot(b.x - a.x, b.y - a.y));
+  }
+  ARC.total = ARC.cum[ARC.pts.length];
+
+  ARC.pinTips = [];
+  for (const s of [-1, 1]) for (const x of PIN_XS){
+    const v = new THREE.Vector3(x, 0.12, s * 3.55).project(camera);
+    ARC.pinTips.push({ x: (v.x * 0.5 + 0.5) * w, y: (-v.y * 0.5 + 0.5) * h, side: s });
+  }
+  ARC.strands = [];
+  ARC.leaps = [];
+}
+
+function outlinePoint(d){
+  d = ((d % ARC.total) + ARC.total) % ARC.total;
+  let lo = 0, hi = ARC.cum.length - 1;
+  while (lo < hi - 1){ const mid = (lo + hi) >> 1; if (ARC.cum[mid] <= d) lo = mid; else hi = mid; }
+  const segLen = ARC.cum[lo+1] - ARC.cum[lo] || 1;
+  const t = (d - ARC.cum[lo]) / segLen;
+  const a = ARC.pts[lo % ARC.pts.length], b = ARC.pts[(lo+1) % ARC.pts.length];
+  return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+}
+
+function strokePts(pts){
+  actx.beginPath();
+  actx.moveTo(pts[0].x, pts[0].y);
+  for (let i = 1; i < pts.length; i++) actx.lineTo(pts[i].x, pts[i].y);
+  actx.stroke();
+}
+
+function drawArcs(dt, energy){
+  const w = stage.clientWidth, h = stage.clientHeight;
+  actx.clearRect(0, 0, w, h);
+  if (!ARC.total) return;
+
+  // strands crawl along the package outline; more + brighter on hover
+  const want = energy > 0.5 ? 5 : 3;
+  while (ARC.strands.length < want)
+    ARC.strands.push({
+      pos: Math.random() * ARC.total,
+      len: ARC.total * (0.08 + Math.random() * 0.12),
+      speed: ARC.total * (0.10 + Math.random() * 0.20) * (Math.random() < 0.5 ? -1 : 1),
+    });
+  if (ARC.strands.length > want) ARC.strands.length = want;
+
+  const amp = 4 + energy * 9;
+  const alpha = 0.32 + energy * 0.60;
+
+  for (const s of ARC.strands){
+    s.pos += s.speed * dt;
+    const SEG = 16, pts = [];
+    for (let i = 0; i <= SEG; i++) pts.push(outlinePoint(s.pos + (s.len * i) / SEG));
+    for (let i = 1; i < SEG; i++){
+      const env = Math.sin(Math.PI * i / SEG);
+      pts[i].x += (Math.random() - 0.5) * 2 * amp * env;
+      pts[i].y += (Math.random() - 0.5) * 2 * amp * env;
+    }
+    actx.save();
+    actx.shadowColor = 'rgba(59,130,246,0.85)';
+    actx.shadowBlur = 12 + energy * 10;
+    actx.strokeStyle = 'rgba(96,165,250,' + alpha.toFixed(3) + ')';
+    actx.lineWidth = 2.5 + energy * 1.5;
+    actx.lineJoin = 'round'; actx.lineCap = 'round';
+    strokePts(pts);
+    actx.restore();
+    actx.strokeStyle = 'rgba(239,246,255,' + Math.min(1, alpha + 0.25).toFixed(3) + ')';
+    actx.lineWidth = 1.1;
+    actx.lineJoin = 'round'; actx.lineCap = 'round';
+    strokePts(pts);
+  }
+
+  // short arcs leaping between adjacent pins
+  ARC.leapTimer -= dt;
+  if (ARC.leapTimer <= 0){
+    ARC.leapTimer = energy > 0.5 ? 0.3 + Math.random() * 0.4 : 1.1 + Math.random() * 1.2;
+    const side = Math.random() < 0.5 ? -1 : 1;
+    const pins = ARC.pinTips.filter(p => p.side === side);
+    if (pins.length > 1){
+      const i = (Math.random() * (pins.length - 1)) | 0;
+      ARC.leaps.push({ a: pins[i], b: pins[i+1], life: 0.28, max: 0.28 });
+    }
+  }
+  ARC.leaps = ARC.leaps.filter(l => (l.life -= dt) > 0);
+  for (const l of ARC.leaps){
+    const k = l.life / l.max;
+    const mx = (l.a.x + l.b.x) / 2, my = (l.a.y + l.b.y) / 2 - 14 - 22 * k;
+    const pts = [{ x: l.a.x, y: l.a.y }];
+    const ctrl = { x: mx, y: my };
+    for (const [p0, p1] of [[l.a, ctrl], [ctrl, l.b]]){
+      for (let i = 1; i <= 7; i++){
+        const t = i / 7, env = Math.sin(Math.PI * t);
+        pts.push({
+          x: p0.x + (p1.x - p0.x) * t + (Math.random() - 0.5) * 14 * env,
+          y: p0.y + (p1.y - p0.y) * t + (Math.random() - 0.5) * 14 * env,
+        });
+      }
+    }
+    actx.save();
+    actx.shadowColor = 'rgba(59,130,246,0.9)'; actx.shadowBlur = 14;
+    actx.strokeStyle = 'rgba(147,197,253,' + (0.8 * k).toFixed(3) + ')';
+    actx.lineWidth = 2.2; actx.lineJoin = 'round'; actx.lineCap = 'round';
+    strokePts(pts);
+    actx.restore();
+    actx.strokeStyle = 'rgba(255,255,255,' + (0.9 * k).toFixed(3) + ')';
+    actx.lineWidth = 1;
+    strokePts(pts);
+  }
+}
+
 /* ---------- interaction: slide across -> marking crossfades to identity ---------- */
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2(-2, -2);
@@ -295,6 +437,7 @@ function resize(){
   const w = stage.clientWidth, h = stage.clientHeight;
   renderer.setSize(w, h, false);
   camera.aspect = w / h; camera.updateProjectionMatrix();
+  rebuildArcGeometry();
 }
 window.addEventListener('resize', resize); resize();
 
@@ -317,6 +460,9 @@ function animate(){
   // flat crossfade: laser marking <-> identity text, package stays solid
   markMat.opacity = 1 - revealK;
   revealMat.opacity = revealK;
+
+  // electric arcs: faint current at rest, charged on hover
+  drawArcs(dt, revealK);
 
   renderer.render(scene, camera);
 }
